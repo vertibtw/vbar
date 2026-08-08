@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 
     std::string config_path;
 
-    config_path = home_dir + "/.shell.ini"; // I don't wanna do configs in .config
+    config_path = home_dir + "/.vbar.ini"; // I don't wanna do configs in .config
 
     std::ifstream f(config_path);
 
@@ -59,16 +59,16 @@ int main(int argc, char **argv) {
         css_buf = std::format("{}\n{}", themes::catppuccin::mocha, themes::core);
     }
 
-    auto app = Gtk::Application::create("v.shell");
+    auto app = Gtk::Application::create("v.bar");
 
-    auto bar = Gtk::make_managed<widgets::Bar>(conf);
+    auto bar_widget = Gtk::make_managed<bar::Bar>(conf);
 
     app->signal_startup().connect([&]() -> void {
         css->load_from_data(css_buf);
         Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), css,
                                                     GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-        app->add_window(*bar);
-        app->signal_activate().connect([&]() -> void { bar->present(); });
+        app->add_window(*bar_widget);
+        app->signal_activate().connect([&]() -> void { bar_widget->present(); });
     });
 
     return app->run(argc, argv);

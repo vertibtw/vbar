@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(shell LANGUAGES CXX)
+project(vbar LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,11 +17,11 @@ pkg_check_modules(WIREPLUMBER REQUIRED IMPORTED_TARGET wireplumber-0.5)
 
 file(GLOB_RECURSE SOURCES src/*.cpp)
 
-add_executable(shell ${SOURCES})
-target_link_libraries(shell PRIVATE
+add_executable(vbar ${SOURCES})
+target_link_libraries(vbar PRIVATE
   PkgConfig::GTKMM4
   PkgConfig::GTK4_LAYER_SHELL
   PkgConfig::WIREPLUMBER
 )
 
-install(TARGETS shell RUNTIME DESTINATION bin)
+install(TARGETS vbar RUNTIME DESTINATION bin)

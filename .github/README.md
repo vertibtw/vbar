@@ -1,18 +1,19 @@
-# my shell (it's not very quick)
+# vbar
 
 ---
 
-A kinda usable bar written in gtkmm4.
+verti's (kinda usable) bar
 
 ![screenshot](assets/screenshot.png)
 
+
 TODO:
-- [ ] hyprland
+- [x] hyprland
   - [x] workspaces
   - [x] active window title
-  - [ ] changing layouts per workspace
 - [ ] config
   - [x] basic ini config
   - [ ] vertical bar
   - [ ] configurable module positions
+- [ ] support multiple monitors
 - [ ] systray

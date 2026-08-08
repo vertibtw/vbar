@@ -1,4 +1,5 @@
 #include "workspaces.hpp"
+#include "bar.hpp"
 
 void bar::modules::Workspaces::change_active_ws(int ws_id) {
     for (auto workspace : this->workspaces) {
@@ -35,13 +36,17 @@ void bar::modules::Workspaces::create_ws(int ws_id) {
 bar::modules::Workspaces::Workspaces(std::shared_ptr<hyprland::Ipc> Ipc)
     : ipc(Ipc) {
     this->workspaces = this->ipc->get_initial_workspaces();
-    this->set_orientation(Gtk::Orientation::HORIZONTAL);
+    this->set_orientation(bar::orientation);
     this->set_spacing(6);
-    this->set_valign(Gtk::Align::CENTER); // this fixes sizing issues (will be set_halign for a vertical bar)
+
+    if (bar::orientation == Gtk::Orientation::HORIZONTAL)
+        this->set_valign(Gtk::Align::CENTER);
+    else
+        this->set_halign(Gtk::Align::CENTER);
 
     for (const auto &workspace : this->workspaces) {
-        // auto l = Gtk::make_managed<Gtk::Label>(std::to_string(workspace->id));
-        // workspace->append(*l);
+        //        auto l = Gtk::make_managed<Gtk::Label>(std::to_string(workspace->id));
+        //        workspace->append(*l);
         this->append(*workspace);
     }
 }

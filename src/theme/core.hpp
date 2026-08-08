@@ -19,27 +19,48 @@ inline constexpr std::string_view core = R"CSS(
     background: var(--background_main);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
+label.rotated {
+    transform: rotate(90deg);
+}
 .left-box {
     margin-left: 10px;
 }
 .right-box {
     margin-right: 10px;
 }
-.workspace {
+
+.horizontal_bar .workspace {
     min-width: 20px;
     min-height: 4px;
     background: var(--background_light);
     margin: 0 2px;
     transition: background 200ms ease, min-width 200ms ease, min-height 200ms ease;
 }
-.workspace.occupied {
+.horizontal_bar .workspace.occupied {
     background: var(--foreground_secondary);
 }
-.workspace.active {
+.horizontal_bar .workspace.active {
     min-width: 28px;
-    min-height: 6px;
+    min-height: 4px;
     background: var(--purple);
 }
+
+.vertical_bar .workspace {
+    min-height: 20px;
+    min-width: 4px;
+    background: var(--background_light);
+    margin: 2 0px;
+/*    transition: background 200ms ease, min-width 200ms ease, min-height 200ms ease;*/
+}
+.vertical_bar .workspace.occupied {
+    background: var(--foreground_secondary);
+}
+.vertical_bar .workspace.active {
+    min-height: 28px;
+    min-width: 4px;
+    background: var(--purple);
+}
+
 .clock {
     color: var(--foreground_main);
 }

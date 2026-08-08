@@ -19,12 +19,12 @@
 #include "window_title.hpp"
 #include "workspaces.hpp"
 
-namespace widgets {
+namespace bar {
+
+inline Gtk::Orientation orientation = Gtk::Orientation::HORIZONTAL; // here so that I don't have to deal with pointers
 
 class Bar : public Gtk::Window {
     private:
-    bool vertical = false;
-    bool horizontal = false;
     std::shared_ptr<hyprland::Ipc> ipc;
 
     bar::modules::Workspaces *mod_workspaces = nullptr;
@@ -38,4 +38,4 @@ class Bar : public Gtk::Window {
     ~Bar() = default;
 };
 
-} // namespace widgets
+} // namespace bar

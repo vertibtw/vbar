@@ -1,5 +1,5 @@
 {
-  description = "gtk4 desktop shell";
+  description = "verti's gtk4 desktop bar";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -14,7 +14,7 @@
       packages = forAllSystems (system:
         let pkgs = pkgsFor system; in {
           default = pkgs.stdenv.mkDerivation {
-            pname = "notquickshell";
+            pname = "vbar";
             version = "0.0.1";
             src = ./.;
             nativeBuildInputs = with pkgs; [ cmake pkg-config ];
@@ -36,10 +36,10 @@
 
       homeManagerModules.default = { config, pkgs, lib, ... }:
         let
-          cfg = config.programs.notquickshell;
+          cfg = config.programs.vbar;
         in {
-          options.programs.notquickshell = {
-            enable = lib.mkEnableOption "gtk4 desktop shell";
+          options.programs.vbar = {
+            enable = lib.mkEnableOption "verti's gtk4 desktop bar";
             package = lib.mkOption {
               type = lib.types.package;
               default = self.packages.${pkgs.system}.default;
@@ -90,7 +90,7 @@
 
           config = lib.mkIf cfg.enable {
             home.packages = [ cfg.package ];
-            home.file.".shell.ini".text = ''
+            home.file.".vbar.ini".text = ''
               theme = ${cfg.settings.theme}
               [bar]
               position = ${cfg.settings.bar.position}

@@ -1,16 +1,16 @@
 #include "bar.hpp"
 #include <gtkmm/object.h>
 
-namespace widgets {
+namespace bar {
 Bar::Bar(std::shared_ptr<ini> conf) {
     if (!(*conf).contains("bar")) {
         std::cerr << "ERROR: config does not contain a bar section, bar will not be created.\n";
         return;
     }
-    this->set_title("v.shell.bar");
+    this->set_title("v.bar");
     this->set_default_size(67, 69);
     gtk_layer_init_for_window(this->gobj());
-    gtk_layer_set_namespace(this->gobj(), "v.shell");
+    gtk_layer_set_namespace(this->gobj(), "v.bar");
 
     this->ipc = std::make_shared<hyprland::Ipc>();
 
@@ -24,50 +24,41 @@ Bar::Bar(std::shared_ptr<ini> conf) {
 
     this->add_css_class("bar");
 
-    /*
-    **********************************
-    *          POSITION              *
-    **********************************
-    */
-
     // TODO: find a cleaner way to do this maybe
     if (!(*conf).contains("bar", "position")) {
-        std::cerr << "WARN: no bar position provided, using default (top)\n"; // uh yes
-        goto top;
+        std::cerr << "WARN: no bar position provided, using default (top)\n";
+        goto top; // I feel like linus torvalds
     } else if ((*conf)["bar"]["position"] == "top") {
     top:
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_LEFT, true);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_RIGHT, true);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_TOP, true);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, false);
-        this->horizontal = true;
+        bar::orientation = Gtk::Orientation::HORIZONTAL;
     } else if ((*conf)["bar"]["position"] == "bottom") {
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_LEFT, true);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_RIGHT, true);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_TOP, false);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, true);
-        this->horizontal = true;
+        bar::orientation = Gtk::Orientation::HORIZONTAL;
     } else if ((*conf)["bar"]["position"] == "left") {
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_LEFT, true);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_RIGHT, false);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_TOP, true);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, true);
-        this->vertical = true;
+        bar::orientation = Gtk::Orientation::VERTICAL;
     } else if ((*conf)["bar"]["position"] == "right") {
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_LEFT, false);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_RIGHT, true);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_TOP, true);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, true);
-        this->vertical = true;
+        bar::orientation = Gtk::Orientation::VERTICAL;
     } else {
         std::cerr << "WARN: invalid bar position ('" << (*conf)["bar"]["position"] << "'), using default (top)\n";
         goto top;
     }
-    /*
-    **********************************
-    *           MARGINS              *
-    **********************************
-    */
+
+    this->add_css_class(bar::orientation == Gtk::Orientation::HORIZONTAL ? "horizontal_bar" : "vertical_bar");
 
 #define ASSERT_INT(conf_val)                                                                                           \
     if (!util::is_number(conf_val)) {                                                                                  \
@@ -93,24 +84,13 @@ Bar::Bar(std::shared_ptr<ini> conf) {
         gtk_layer_set_margin(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, std::stoi((*conf)["bar"]["margin-bottom"]));
     }
 
-    /*
-    **********************************
-    *         THICKNESS              *
-    **********************************
-    */
-
     if ((*conf).contains("bar", "thickness")) {
         ASSERT_INT((*conf)["bar"]["thickness"]);
         int value = std::stoi((*conf)["bar"]["thickness"]);
-        gtk_window_set_default_size(this->gobj(), vertical ? value : 0, horizontal ? value : 0);
+        gtk_window_set_default_size(this->gobj(), bar::orientation == Gtk::Orientation::VERTICAL ? value : 0,
+                                    bar::orientation == Gtk::Orientation::HORIZONTAL ? value : 0);
     }
 #undef ASSERT_INT
-
-    /*
-     **********************************
-     *           MODULES              *
-     **********************************
-     */
 
     auto main_box = Gtk::make_managed<Gtk::CenterBox>();
     main_box->set_expand(true);
@@ -157,6 +137,12 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     r_box->append(*this->mod_battery);
     r_box->append(*this->mod_clock);
 
+    // orientation
+    main_box->set_orientation(bar::orientation);
+    l_box->set_orientation(bar::orientation);
+    c_box->set_orientation(bar::orientation);
+    r_box->set_orientation(bar::orientation);
+
     // lambdas :<
     ipc->on_event = [this](std::string event, std::string arg) -> void {
         Glib::signal_idle().connect_once([this, event, arg]() -> void {
@@ -177,4 +163,4 @@ Bar::Bar(std::shared_ptr<ini> conf) {
         });
     };
 }
-} // namespace widgets
+} // namespace bar

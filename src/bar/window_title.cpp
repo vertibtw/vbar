@@ -1,11 +1,11 @@
 #include "window_title.hpp"
 #include "../util/extern/json.hpp"
+#include "bar.hpp"
 
-namespace bar {
-namespace modules {
+namespace bar::modules {
 WindowTitle::WindowTitle(std::shared_ptr<hyprland::Ipc> Ipc)
     : ipc(Ipc) {
-    this->set_orientation(Gtk::Orientation::HORIZONTAL); // TODO you know what ...
+    this->set_orientation(bar::orientation);
     this->set_spacing(4);
     this->add_css_class("window_title");
 
@@ -15,16 +15,22 @@ WindowTitle::WindowTitle(std::shared_ptr<hyprland::Ipc> Ipc)
 
     if (j.empty()) {
         app = "";
-        win_title = ""; // so espaniol muchacho
+        win_title = "";
     } else {
         if (j.contains("class"))
             app = j["class"];
         if (j.contains("title"))
             win_title = j["title"];
     }
+
     this->title = Gtk::make_managed<Gtk::Label>();
     this->title->set_max_width_chars(30);
     this->title->set_ellipsize(Pango::EllipsizeMode::END);
+
+    if (bar::orientation == Gtk::Orientation::VERTICAL) {
+        this->title->add_css_class("rotated");
+    }
+
     this->icon = Gtk::make_managed<Gtk::Image>();
 
     this->append(*this->icon);
@@ -42,7 +48,7 @@ void WindowTitle::on_window_title_change(std::string new_title) {
 
     if (app_name.empty()) {
         this->icon->clear();
-        this->title->set_text("un sentimiento de vacío");
+        this->title->set_text("un sentimiento de vacío"); // so espaniol muchacho
         return;
     }
 
@@ -76,5 +82,4 @@ std::unordered_map<std::string, Glib::RefPtr<Gio::Icon>> WindowTitle::get_app_ic
     }
     return r;
 }
-} // namespace modules
-} // namespace bar
+} // namespace bar::modules
