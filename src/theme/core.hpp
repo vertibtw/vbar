@@ -16,7 +16,7 @@ inline constexpr std::string_view core = R"CSS(
     font-weight: bold;
 }
 .bar {
-    background-color: alpha(var(--background_main), 0.8);
+    background-color: alpha(var(--background_main), 0.85);
 /*    background-color: #ffffff;*/
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
