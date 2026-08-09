@@ -16,7 +16,8 @@ inline constexpr std::string_view core = R"CSS(
     font-weight: bold;
 }
 .bar {
-    background: var(--background_main);
+    background-color: alpha(var(--background_main), 0.8);
+/*    background-color: #ffffff;*/
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 label.rotated {
@@ -50,7 +51,6 @@ label.rotated {
     min-width: 4px;
     background: var(--background_light);
     margin: 2 0px;
-/*    transition: background 200ms ease, min-width 200ms ease, min-height 200ms ease;*/
 }
 .vertical_bar .workspace.occupied {
     background: var(--foreground_secondary);

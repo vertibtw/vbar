@@ -1,7 +1,7 @@
 #pragma once
 #include <glibmm/main.h>
 #include <gtk/gtk.h>
-#include <gtk4-layer-shell/gtk4-layer-shell.h>
+#include <gtk4-layer-shell.h>
 #include <gtkmm.h>
 #include <gtkmm/box.h>
 #include <gtkmm/centerbox.h>

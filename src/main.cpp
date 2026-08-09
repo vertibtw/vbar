@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
     app->signal_startup().connect([&]() -> void {
         css->load_from_data(css_buf);
         Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), css,
-                                                    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+                                                    GTK_STYLE_PROVIDER_PRIORITY_USER + 1);
         app->add_window(*bar_widget);
         app->signal_activate().connect([&]() -> void { bar_widget->present(); });
     });

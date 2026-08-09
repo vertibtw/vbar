@@ -4,7 +4,7 @@
 namespace themes::catppuccin {
 inline constexpr std::string_view mocha =
     R"CSS(:root {
-        --background_main: #11111bd9;
+        --background_main: #11111b;
         --background_secondary: #1e1e2e;
         --background_light: #313244;
         --foreground_main: #cdd6f4;
