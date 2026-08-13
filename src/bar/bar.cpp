@@ -129,11 +129,16 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     this->mod_clock = Gtk::make_managed<bar::modules::Clock>();
     this->mod_battery = Gtk::make_managed<bar::modules::Battery>();
     this->mod_vol_btn = Gtk::make_managed<bar::modules::VolumeButton>(popover);
+    this->mod_sr_btn = Gtk::make_managed<bar::modules::RecordButton>();
+    this->mod_cp_btn = Gtk::make_managed<bar::modules::PickerButton>();
+
     popover->volume_button = this->mod_vol_btn;
 
     l_box->append(*this->mod_window_title);
     c_box->append(*this->mod_workspaces);
     r_box->append(*this->mod_vol_btn);
+    r_box->append(*this->mod_sr_btn);
+    r_box->append(*this->mod_cp_btn);
     r_box->append(*this->mod_battery);
     r_box->append(*this->mod_clock);
 

@@ -19,6 +19,7 @@ inline constexpr std::string_view core = R"CSS(
     background-color: alpha(var(--background_main), 0.85);
 /*    background-color: #ffffff;*/
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    padding: 2px;
 }
 label.rotated {
     transform: rotate(90deg);
@@ -68,6 +69,7 @@ label.rotated {
     background: none;
     box-shadow: none;
     border: none;
+    padding: 0;
 }
 .volume_window {
     border-radius: 0;
@@ -127,6 +129,19 @@ label.rotated {
 }
 .battery .unknown {
     color: var(--purple);
+}
+.sr_button {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--foreground_main);
+}
+.cp_button {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--foreground_main);
+
 }
 )CSS";
 }
