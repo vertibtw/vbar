@@ -6,7 +6,7 @@ Ipc::Ipc() {
     this->runtimedir = std::getenv("XDG_RUNTIME_DIR");
 
     if (this->his.empty() || this->runtimedir.empty()) {
-        std::cerr << "ERROR: hyprland env not set (is hyprland running?)\n";
+        lg::err("hyprland env not set (is hyprland running?)");
         std::exit(1);
     }
 
@@ -27,7 +27,7 @@ std::string Ipc::socket1(std::string cmd) {
     int s = socket(AF_UNIX, SOCK_STREAM, 0);
     if (s < 0) {
         // idk what to put here, so I'll just have different exit statuses for now
-        std::cerr << "ERROR: couldn't connect to hyprland's ipc.\n";
+        lg::err("couldn't connect to hyprland's ipc");
         std::exit(1);
     }
 
@@ -36,7 +36,7 @@ std::string Ipc::socket1(std::string cmd) {
     strcpy(addr.sun_path, socket_path.c_str());
 
     if (connect(s, (sockaddr *)&addr, sizeof(addr)) < 0) {
-        std::cerr << "ERROR: couldn't connect to hyprland's ipc.\n";
+        lg::err("couldn't connect to hyprland's ipc");
         std::exit(2);
     }
 
@@ -49,10 +49,9 @@ std::string Ipc::socket1(std::string cmd) {
     while ((received = recv(s, buffer, sizeof(buffer) - 1, 0)) > 0) {
         buffer[received] = '\0';
         response.append(buffer, received);
-        // std::cout << buffer << "\n";
     }
     if (received < 0) {
-        std::cerr << "ERROR: recv failed: " << strerror(errno) << "\n";
+        lg::err(std::format("recv failed: {}", strerror(errno)));
     }
     close(s);
     return response;
@@ -68,7 +67,7 @@ void Ipc::socket2() {
     strcpy(addr.sun_path, socket_path.c_str());
 
     if (connect(this->s2, (sockaddr *)&addr, sizeof(addr)) < 0) {
-        std::cerr << "ERROR: couldn't connect to hyprland's ipc.\n";
+        lg::err("couldn't connect to hyprland's ipc");
         std::exit(3);
     }
 
@@ -105,7 +104,7 @@ std::vector<Workspace *> Ipc::get_initial_workspaces() {
     if (j_a_ws.contains("id")) {
         active_ws_id = j_a_ws["id"].get<int>();
     } else {
-        std::cerr << "WARN: ipc did not provide active workspace id\n"; // shouldn't happen probably
+        lg::err("ipc did not provide active workspace id");
     }
 
     std::vector<int> ws_ids;
@@ -115,7 +114,7 @@ std::vector<Workspace *> Ipc::get_initial_workspaces() {
             if (id >= 0)
                 ws_ids.push_back(id);
         } else {
-            std::cerr << "warn: workspace doesn't contain id.\n";
+            lg::err("workspace doesn't contain id");
         }
     }
 

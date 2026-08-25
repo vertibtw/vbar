@@ -9,16 +9,16 @@
 #include "bar/bar.hpp"
 #include "ini/ini.hpp"
 #include "theme/core.hpp"
+#include "util/log.hpp"
 
 int main(int argc, char **argv) {
     std::stringstream ss;
-
     std::string home_dir;
     char *home_dir_ = std::getenv("HOME");
 
     if (home_dir_ == nullptr || std::string(home_dir_).empty()) {
-        std::cerr << "ERROR: $HOME environment variable not set.\n";
-        std::exit(1);
+        lg::err("HOME environment variable not set.");
+        std::exit(EXIT_FAILURE);
     } else {
         home_dir = home_dir_;
     }
@@ -30,8 +30,8 @@ int main(int argc, char **argv) {
     std::ifstream f(config_path);
 
     if (!f.is_open()) {
-        std::cout << "ERROR: couldn't open config file '" << config_path << "'\n";
-        return EXIT_FAILURE;
+        lg::err(std::format("couldn't open config file '{}'", config_path));
+        std::exit(EXIT_FAILURE);
     }
     ss << f.rdbuf();
 
@@ -51,11 +51,11 @@ int main(int argc, char **argv) {
         else if ((*conf)[""]["theme"] == "catppuccin macchiato")
             css_buf = std::format("{}\n{}", themes::catppuccin::macchiato, themes::core);
         else {
-            std::cerr << "ERROR: invalid theme name: '" << (*conf)[""]["theme"] << "'; using catppuccin mocha.\n";
+            lg::err(std::format("invalid theme name: '{}'; using catppuccin mocha.", (*conf)[""]["theme"]));
             css_buf = std::format("{}\n{}", themes::catppuccin::mocha, themes::core);
         }
     } else {
-        std::cerr << "WARN: no theme provided, using catppuccin mocha.\n";
+        lg::warn("no theme provided, using catppuccin mocha.");
         css_buf = std::format("{}\n{}", themes::catppuccin::mocha, themes::core);
     }
 
@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
         app->signal_activate().connect([&]() -> void { bar_widget->present(); });
     });
 
-    app->signal_shutdown().connect([]() -> void { std::cerr << "\e[1;32mINFO\e[0m: bye bye\n"; });
+    app->signal_shutdown().connect([]() -> void {});
 
     return app->run(argc, argv);
 }

@@ -12,6 +12,7 @@
 #include "../ini/ini.hpp"
 #include "../ipc/hyprland/ipc.hpp"
 #include "../util/is_int.hpp"
+#include "../util/log.hpp"
 #include "battery.hpp"
 #include "clock.hpp"
 #include "color_picker.hpp"

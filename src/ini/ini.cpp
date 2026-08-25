@@ -3,8 +3,8 @@
 #define NEXT(i, bs, errormsg)                                                                                          \
     do {                                                                                                               \
         if ((i) >= (bs)) {                                                                                             \
-            std::cerr << "ERROR: " << errormsg << "\n";                                                                \
-            std::exit(1);                                                                                              \
+            lg::err(errormsg);                                                                                         \
+            std::exit(EXIT_FAILURE);                                                                                   \
         }                                                                                                              \
         (i)++;                                                                                                         \
     } while (0)
@@ -46,7 +46,7 @@ ini ini::parse(std::string content) {
                 while (buffer[i] != ']') {
                     section += buffer[i];
                     if (i >= bs) {
-                        std::cerr << "ERROR: " << errormsg << " (line " << std::to_string(line_count) << ")\n";
+                        lg::err(std::format("{} (line {})", errormsg, line_count));
                         std::exit(1);
                     }
                     NEXT(i, bs, errormsg);
@@ -65,7 +65,7 @@ ini ini::parse(std::string content) {
                 key = trim(key);
 
                 if (key == "") {
-                    std::cerr << "ERROR: " << errormsg << " (line " << line_count << ")\n";
+                    lg::err(std::format("{} (line {})", errormsg, line_count));
                     std::exit(1);
                 }
 
@@ -81,16 +81,15 @@ ini ini::parse(std::string content) {
                     value += buffer[i++];
                 }
                 value = trim(value);
-                std::cout << "[" << section << "] '" << key << "' = '" << value << "'\n";
+                lg::info(std::format("[{}] '{}' = '{}'", section, key, value));
 
                 r.conf[section][key] = value;
                 key.clear();
 
                 break;
             } else {
-
-                std::cerr << "ERROR: unexpected EOF, on line " << line_count << "\n";
-                std::exit(1);
+                lg::err(std::format("unexpected EOF, on line {}", line_count));
+                std::exit(EXIT_FAILURE);
             }
         }
     }

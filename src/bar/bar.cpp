@@ -1,5 +1,4 @@
 #include "bar.hpp"
-#include <gtkmm/object.h>
 
 namespace bar {
 void Bar::apply_modules(std::string &list, Gtk::Box *box) {
@@ -33,14 +32,14 @@ void Bar::apply_modules(std::string &list, Gtk::Box *box) {
             this->mod_cp_btn = Gtk::make_managed<bar::modules::PickerButton>();
             box->append(*this->mod_cp_btn);
         } else {
-            std::cerr << "WARN: invalid module: '" << mod_name << "'. skipping..\n";
+            lg::warn(std::format("invalid module '{}', skipping", mod_name));
         }
     }
 }
 
 Bar::Bar(std::shared_ptr<ini> conf) {
     if (!(*conf).contains("bar")) {
-        std::cerr << "ERROR: config does not contain a bar section, bar will not be created.\n";
+        lg::err("config does not contain a bar section, bar will not be created.");
         return;
     }
     this->set_title("v.bar");
@@ -62,7 +61,7 @@ Bar::Bar(std::shared_ptr<ini> conf) {
 
     // TODO: find a cleaner way to do this maybe
     if (!(*conf).contains("bar", "position")) {
-        std::cerr << "WARN: no bar position provided, using default (top)\n";
+        lg::warn("no bar position provided, using default (top)");
         goto top; // I feel like linus torvalds
     } else if ((*conf)["bar"]["position"] == "top") {
     top:
@@ -90,7 +89,7 @@ Bar::Bar(std::shared_ptr<ini> conf) {
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, true);
         bar::orientation = Gtk::Orientation::VERTICAL;
     } else {
-        std::cerr << "WARN: invalid bar position ('" << (*conf)["bar"]["position"] << "'), using default (top)\n";
+        lg::warn(std::format("invalid bar position ('{}'), using default (top)", (*conf)["bar"]["position"]));
         goto top;
     }
 
@@ -98,7 +97,7 @@ Bar::Bar(std::shared_ptr<ini> conf) {
 
 #define ASSERT_INT(conf_val)                                                                                           \
     if (!util::is_number(conf_val)) {                                                                                  \
-        std::cerr << "ERROR: margin values have to be integers.\n";                                                    \
+        lg::err("margin values have to be integers.");                                                                 \
         std::exit(1);                                                                                                  \
     }
 

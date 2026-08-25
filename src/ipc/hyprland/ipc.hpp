@@ -2,6 +2,7 @@
 // #include "../../bar/bar.hpp"
 #include "../../bar/workspace.hpp"
 #include "../../util/extern/json.hpp"
+#include "../../util/log.hpp"
 
 #include <algorithm>
 #include <atomic>

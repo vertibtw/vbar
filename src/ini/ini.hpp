@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../util/log.hpp"
+
 class ini {
     private:
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>> conf;
@@ -15,7 +17,7 @@ class ini {
     static ini parse(std::string);
     std::unordered_map<std::string, std::string> &operator[](std::string key) {
         if (!(std::find(section_keys.begin(), section_keys.end(), key) != section_keys.end())) {
-            std::cerr << "ERROR: invalid section: '" << key << "'.\n";
+            lg::err(std::format("invalid section: '{}'", key));
             std::exit(1);
         }
         return conf[key];
