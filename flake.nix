@@ -93,6 +93,10 @@
                       type = lib.types.listOf lib.types.str;
                       default = [ ];
                     };
+                    ws-indicator-type = lib.mkOption {
+                      type = lib.types.enum [ "id" "pill" ];
+                      default = "id";
+                    };
                  };
                 };
               };
@@ -114,6 +118,7 @@
               ${lib.optionalString (cfg.settings.bar.modules-left != []) "modules-left = ${lib.concatStringsSep "," cfg.settings.bar.modules-left}"}
               ${lib.optionalString (cfg.settings.bar.modules-center != []) "modules-center = ${lib.concatStringsSep "," cfg.settings.bar.modules-center}"}
               ${lib.optionalString (cfg.settings.bar.modules-right != []) "modules-right = ${lib.concatStringsSep "," cfg.settings.bar.modules-right}"}
+              ws-indicator-type = ${cfg.settings.bar.ws-indicator-type}
             '';
           };
         };
