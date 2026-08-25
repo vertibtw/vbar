@@ -34,8 +34,11 @@ class Bar : public Gtk::Window {
     bar::modules::Clock *mod_clock = nullptr;
     bar::modules::Battery *mod_battery = nullptr;
     bar::modules::VolumeButton *mod_vol_btn = nullptr;
+    bar::modules::VolumeWindow *mod_vol_win = nullptr;
     bar::modules::RecordButton *mod_sr_btn = nullptr;
     bar::modules::PickerButton *mod_cp_btn = nullptr;
+
+    void apply_modules(std::string &, Gtk::Box *);
 
     public:
     Bar(std::shared_ptr<ini>);

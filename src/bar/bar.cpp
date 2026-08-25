@@ -2,6 +2,42 @@
 #include <gtkmm/object.h>
 
 namespace bar {
+void Bar::apply_modules(std::string &list, Gtk::Box *box) {
+    for (const auto &sub : list | std::views::split(',')) {
+        std::string mod_name(sub.begin(), sub.end());
+        if (mod_name.empty())
+            continue; // skip empties from trailing/double commas
+
+        // might convert this to a map of functions later, idk though
+        if (mod_name == "workspaces") {
+            this->mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc);
+            box->append(*this->mod_workspaces);
+        } else if (mod_name == "title") {
+            this->mod_window_title = Gtk::make_managed<bar::modules::WindowTitle>(this->ipc);
+            box->append(*this->mod_window_title);
+        } else if (mod_name == "clock") {
+            this->mod_clock = Gtk::make_managed<bar::modules::Clock>();
+            box->append(*this->mod_clock);
+        } else if (mod_name == "battery") {
+            this->mod_battery = Gtk::make_managed<bar::modules::Battery>();
+            box->append(*this->mod_battery);
+        } else if (mod_name == "volume") {
+            this->mod_vol_win = Gtk::make_managed<bar::modules::VolumeWindow>();
+            this->mod_vol_btn = Gtk::make_managed<bar::modules::VolumeButton>(this->mod_vol_win);
+            this->mod_vol_win->volume_button = this->mod_vol_btn;
+            box->append(*this->mod_vol_btn);
+        } else if (mod_name == "record") {
+            this->mod_sr_btn = Gtk::make_managed<bar::modules::RecordButton>();
+            box->append(*this->mod_sr_btn);
+        } else if (mod_name == "cpicker") {
+            this->mod_cp_btn = Gtk::make_managed<bar::modules::PickerButton>();
+            box->append(*this->mod_cp_btn);
+        } else {
+            std::cerr << "WARN: invalid module: '" << mod_name << "'. skipping..\n";
+        }
+    }
+}
+
 Bar::Bar(std::shared_ptr<ini> conf) {
     if (!(*conf).contains("bar")) {
         std::cerr << "ERROR: config does not contain a bar section, bar will not be created.\n";
@@ -100,12 +136,13 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     auto c_box = Gtk::make_managed<Gtk::Box>();
     auto r_box = Gtk::make_managed<Gtk::Box>();
 
-    // TODO: spacing from the config
+    // default
     l_box->set_spacing(6);
     c_box->set_spacing(6);
     r_box->set_spacing(6);
 
     if ((*conf).contains("bar", "spacing")) {
+
         int spacing = std::stoi((*conf)["bar"]["spacing"]);
         l_box->set_spacing(spacing);
         c_box->set_spacing(spacing);
@@ -113,8 +150,6 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     }
 
     // popups
-    auto popover = Gtk::make_managed<bar::modules::VolumeWindow>();
-
     // actual bar layout
     l_box->add_css_class("left-box");
     c_box->add_css_class("center-box");
@@ -124,23 +159,16 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     main_box->set_center_widget(*c_box);
     main_box->set_end_widget(*r_box);
 
-    this->mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc);
-    this->mod_window_title = Gtk::make_managed<bar::modules::WindowTitle>(this->ipc);
-    this->mod_clock = Gtk::make_managed<bar::modules::Clock>();
-    this->mod_battery = Gtk::make_managed<bar::modules::Battery>();
-    this->mod_vol_btn = Gtk::make_managed<bar::modules::VolumeButton>(popover);
-    this->mod_sr_btn = Gtk::make_managed<bar::modules::RecordButton>();
-    this->mod_cp_btn = Gtk::make_managed<bar::modules::PickerButton>();
+    if ((*conf).contains("bar", "modules-left")) {
+        apply_modules((*conf)["bar"]["modules-left"], l_box);
+    }
 
-    popover->volume_button = this->mod_vol_btn;
-
-    l_box->append(*this->mod_window_title);
-    c_box->append(*this->mod_workspaces);
-    r_box->append(*this->mod_vol_btn);
-    r_box->append(*this->mod_sr_btn);
-    r_box->append(*this->mod_cp_btn);
-    r_box->append(*this->mod_battery);
-    r_box->append(*this->mod_clock);
+    if ((*conf).contains("bar", "modules-center")) {
+        apply_modules((*conf)["bar"]["modules-center"], c_box);
+    }
+    if ((*conf).contains("bar", "modules-right")) {
+        apply_modules((*conf)["bar"]["modules-right"], r_box);
+    }
 
     // orientation
     main_box->set_orientation(bar::orientation);
@@ -152,16 +180,23 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     ipc->on_event = [this](std::string event, std::string arg) -> void {
         Glib::signal_idle().connect_once([this, event, arg]() -> void {
             if (event == "workspace") {
-                int ws_id = std::stoi(arg);
-                this->mod_workspaces->change_active_ws(ws_id);
+                if (this->mod_workspaces) {
+                    int ws_id = std::stoi(arg);
+                    this->mod_workspaces->change_active_ws(ws_id);
+                }
             } else if (event == "createworkspace") {
-                int ws_id = std::stoi(arg);
-                this->mod_workspaces->create_ws(ws_id);
+                if (this->mod_workspaces) {
+                    int ws_id = std::stoi(arg);
+                    this->mod_workspaces->create_ws(ws_id);
+                }
             } else if (event == "destroyworkspace") {
-                int ws_id = std::stoi(arg);
-                this->mod_workspaces->destroy_ws(ws_id);
+                if (this->mod_workspaces) {
+                    int ws_id = std::stoi(arg);
+                    this->mod_workspaces->destroy_ws(ws_id);
+                }
             } else if (event == "activewindow") {
-                this->mod_window_title->on_window_title_change(arg);
+                if (this->mod_window_title)
+                    this->mod_window_title->on_window_title_change(arg);
             } else {
                 // std::cout << "ommited event: " << event << " >> " << arg << "\n";
             }

@@ -81,7 +81,19 @@
                       type = lib.types.ints.unsigned;
                       default = 0;
                     };
-                  };
+                    modules-left = lib.mkOption {
+                      type = lib.types.listOf lib.types.str;
+                      default = [ ];
+                    };
+                    modules-center = lib.mkOption {
+                      type = lib.types.listOf lib.types.str;
+                      default = [ ];
+                    };
+                    modules-right = lib.mkOption {
+                      type = lib.types.listOf lib.types.str;
+                      default = [ ];
+                    };
+                 };
                 };
               };
               default = {};
@@ -99,6 +111,9 @@
               ${lib.optionalString (cfg.settings.bar.margin-right != 0) "margin-right = ${toString cfg.settings.bar.margin-right}"}
               ${lib.optionalString (cfg.settings.bar.margin-top != 0) "margin-top = ${toString cfg.settings.bar.margin-top}"}
               ${lib.optionalString (cfg.settings.bar.margin-bottom != 0) "margin-bottom = ${toString cfg.settings.bar.margin-bottom}"}
+              ${lib.optionalString (cfg.settings.bar.modules-left != []) "modules-left = ${lib.concatStringsSep "," cfg.settings.bar.modules-left}"}
+              ${lib.optionalString (cfg.settings.bar.modules-center != []) "modules-center = ${lib.concatStringsSep "," cfg.settings.bar.modules-center}"}
+              ${lib.optionalString (cfg.settings.bar.modules-right != []) "modules-right = ${lib.concatStringsSep "," cfg.settings.bar.modules-right}"}
             '';
           };
         };

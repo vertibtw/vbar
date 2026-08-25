@@ -71,5 +71,7 @@ int main(int argc, char **argv) {
         app->signal_activate().connect([&]() -> void { bar_widget->present(); });
     });
 
+    app->signal_shutdown().connect([]() -> void { std::cerr << "\e[1;32mINFO\e[0m: bye bye\n"; });
+
     return app->run(argc, argv);
 }

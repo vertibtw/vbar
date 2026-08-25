@@ -4,6 +4,12 @@ namespace hyprland {
 Ipc::Ipc() {
     this->his = std::getenv("HYPRLAND_INSTANCE_SIGNATURE");
     this->runtimedir = std::getenv("XDG_RUNTIME_DIR");
+
+    if (this->his.empty() || this->runtimedir.empty()) {
+        std::cerr << "ERROR: hyprland env not set (is hyprland running?)\n";
+        std::exit(1);
+    }
+
     this->event_thread = std::thread(&Ipc::socket2, this);
 }
 
