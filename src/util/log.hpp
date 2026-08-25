@@ -1,8 +1,6 @@
 #pragma once
 #include <print>
 
-#define red "xyz"
-
 namespace lg {
 inline void info(std::string msg) {
     std::println("\e[1;32mINFO\e[0m: {}", msg);
