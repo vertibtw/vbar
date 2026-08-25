@@ -33,8 +33,9 @@ void bar::modules::Workspaces::create_ws(int ws_id) {
     }
 }
 
-bar::modules::Workspaces::Workspaces(std::shared_ptr<hyprland::Ipc> Ipc)
-    : ipc(Ipc) {
+bar::modules::Workspaces::Workspaces(std::shared_ptr<hyprland::Ipc> Ipc, std::string indicator_type)
+    : ipc(Ipc)
+    , indicator_type(indicator_type) {
     this->workspaces = this->ipc->get_initial_workspaces();
     this->set_orientation(bar::orientation);
     this->set_spacing(6);
@@ -45,8 +46,10 @@ bar::modules::Workspaces::Workspaces(std::shared_ptr<hyprland::Ipc> Ipc)
         this->set_halign(Gtk::Align::CENTER);
 
     for (const auto &workspace : this->workspaces) {
-        //        auto l = Gtk::make_managed<Gtk::Label>(std::to_string(workspace->id));
-        //        workspace->append(*l);
+        if (this->indicator_type == "id") {
+            auto l = Gtk::make_managed<Gtk::Label>(std::to_string(workspace->id));
+            workspace->append(*l);
+        }
         this->append(*workspace);
     }
 }

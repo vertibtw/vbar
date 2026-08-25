@@ -9,28 +9,7 @@
 #include "./themes/catppuccin/mocha.hpp"
 #include <string_view>
 namespace themes {
-inline constexpr std::string_view core = R"CSS(
-* {
-    font-family: 'Scientifica';
-    font-size: 15px;
-    font-weight: bold;
-}
-.bar {
-    background-color: alpha(var(--background_main), 0.85);
-/*    background-color: #ffffff;*/
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    padding: 2px;
-}
-label.rotated {
-    transform: rotate(90deg);
-}
-.left-box {
-    margin-left: 10px;
-}
-.right-box {
-    margin-right: 10px;
-}
-
+inline constexpr std::string_view pill_ws = R"CSS(
 .horizontal_bar .workspace {
     min-width: 20px;
     min-height: 4px;
@@ -61,6 +40,58 @@ label.rotated {
     min-width: 4px;
     background: var(--purple);
 }
+)CSS";
+
+inline constexpr std::string_view id_ws = R"CSS(
+.horizontal_bar .workspace {
+    color: var(--background_light);
+    background: transparent;
+    margin: 0 2px;
+}
+.horizontal_bar .workspace.occupied {
+    color: var(--foreground_secondary);
+}
+.horizontal_bar .workspace.active {
+    color: var(--purple);
+}
+
+.vertical_bar .workspace {
+    color: var(--background_light);
+    margin: 2 0px;
+}
+.vertical_bar .workspace.occupied {
+    color: var(--foreground_secondary);
+}
+.vertical_bar .workspace.active {
+    min-height: 28px;
+    min-width: 4px;
+    color: var(--purple);
+}
+)CSS";
+
+inline constexpr std::string_view core = R"CSS(
+* {
+    font-family: 'Scientifica';
+    font-size: 15px;
+    font-weight: bold;
+}
+.bar {
+    background-color: alpha(var(--background_main), 0.85);
+/*    background-color: #ffffff;*/
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    padding: 2px;
+}
+label.rotated {
+    transform: rotate(90deg);
+}
+.left-box {
+    margin-left: 10px;
+}
+.right-box {
+    margin-right: 10px;
+}
+
+
 
 .clock {
     color: var(--foreground_main);
@@ -144,4 +175,4 @@ label.rotated {
 
 }
 )CSS";
-}
+} // namespace themes

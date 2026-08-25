@@ -39,7 +39,7 @@ class Bar : public Gtk::Window {
     bar::modules::RecordButton *mod_sr_btn = nullptr;
     bar::modules::PickerButton *mod_cp_btn = nullptr;
 
-    void apply_modules(std::string &, Gtk::Box *);
+    void apply_modules(std::string &, Gtk::Box *, std::shared_ptr<ini>);
 
     public:
     Bar(std::shared_ptr<ini>);

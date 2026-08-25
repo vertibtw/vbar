@@ -4,6 +4,7 @@
 #include <gtkmm.h>
 #include <iostream>
 #include <memory>
+#include <print>
 #include <sstream>
 
 #include "bar/bar.hpp"
@@ -41,6 +42,7 @@ int main(int argc, char **argv) {
     auto css = Gtk::CssProvider::create();
     std::string css_buf;
 
+    // this is a terrible excuse to use std::format lol
     if (conf->contains("", "theme")) {
         if ((*conf)[""]["theme"] == "catppuccin mocha")
             css_buf = std::format("{}\n{}", themes::catppuccin::mocha, themes::core);
@@ -58,6 +60,20 @@ int main(int argc, char **argv) {
         lg::warn("no theme provided, using catppuccin mocha.");
         css_buf = std::format("{}\n{}", themes::catppuccin::mocha, themes::core);
     }
+
+    if (conf->contains("bar", "ws-indicator-type")) {
+        if ((*conf)["bar"]["ws-indicator-type"] == "id")
+            css_buf = std::format("{}\n{}", themes::id_ws, css_buf);
+        else if ((*conf)["bar"]["ws-indicator-type"] == "pill")
+            css_buf = std::format("{}\n{}", themes::pill_ws, css_buf);
+        else
+            css_buf = std::format("{}\n{}", themes::id_ws, css_buf);
+    } else {
+        lg::warn("no workspace indicator type provided, using default (id)");
+        css_buf = std::format("{}\n{}", themes::id_ws, css_buf);
+    }
+
+    lg::info(std::format("css_buf = \n {}", css_buf));
 
     auto app = Gtk::Application::create("v.bar");
 

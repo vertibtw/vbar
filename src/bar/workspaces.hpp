@@ -10,8 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace bar {
-namespace modules {
+namespace bar::modules {
 class Workspaces : public Gtk::Box {
     private:
     std::vector<hyprland::Workspace *> workspaces;
@@ -22,8 +21,9 @@ class Workspaces : public Gtk::Box {
     void destroy_ws(int);
     void create_ws(int);
 
-    Workspaces(std::shared_ptr<hyprland::Ipc>);
+    std::string indicator_type; // this could probably be an enum but I don't wanna do that for now.
+
+    Workspaces(std::shared_ptr<hyprland::Ipc>, std::string);
     ~Workspaces() = default;
 };
-} // namespace modules
-} // namespace bar
+} // namespace bar::modules

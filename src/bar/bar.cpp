@@ -1,7 +1,7 @@
 #include "bar.hpp"
 
 namespace bar {
-void Bar::apply_modules(std::string &list, Gtk::Box *box) {
+void Bar::apply_modules(std::string &list, Gtk::Box *box, std::shared_ptr<ini> conf) {
     for (const auto &sub : list | std::views::split(',')) {
         std::string mod_name(sub.begin(), sub.end());
         if (mod_name.empty())
@@ -9,7 +9,14 @@ void Bar::apply_modules(std::string &list, Gtk::Box *box) {
 
         // might convert this to a map of functions later, idk though
         if (mod_name == "workspaces") {
-            this->mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc);
+            std::string type;
+            // the validity of this is checked before
+            if (conf->contains("bar", "ws-indicator-type")) {
+                type = (*conf)["bar"]["ws-indicator-type"];
+            } else {
+                type = "id";
+            }
+            this->mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc, type);
             box->append(*this->mod_workspaces);
         } else if (mod_name == "title") {
             this->mod_window_title = Gtk::make_managed<bar::modules::WindowTitle>(this->ipc);
@@ -50,12 +57,6 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     this->ipc = std::make_shared<hyprland::Ipc>();
 
     gtk_layer_auto_exclusive_zone_enable(this->gobj());
-
-    /*
-    **********************************
-    *             CSS                *
-    **********************************
-    */
 
     this->add_css_class("bar");
 
@@ -159,14 +160,14 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     main_box->set_end_widget(*r_box);
 
     if ((*conf).contains("bar", "modules-left")) {
-        apply_modules((*conf)["bar"]["modules-left"], l_box);
+        apply_modules((*conf)["bar"]["modules-left"], l_box, conf);
     }
 
     if ((*conf).contains("bar", "modules-center")) {
-        apply_modules((*conf)["bar"]["modules-center"], c_box);
+        apply_modules((*conf)["bar"]["modules-center"], c_box, conf);
     }
     if ((*conf).contains("bar", "modules-right")) {
-        apply_modules((*conf)["bar"]["modules-right"], r_box);
+        apply_modules((*conf)["bar"]["modules-right"], r_box, conf);
     }
 
     // orientation
