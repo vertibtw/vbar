@@ -66,8 +66,10 @@ int main(int argc, char **argv) {
             css_buf = std::format("{}\n{}", themes::id_ws, css_buf);
         else if ((*conf)["bar"]["ws-indicator-type"] == "pill")
             css_buf = std::format("{}\n{}", themes::pill_ws, css_buf);
-        else
-            css_buf = std::format("{}\n{}", themes::id_ws, css_buf);
+        else {
+            lg::err(std::format("invalid workspace indicator type: '{}'", (*conf)["bar"]["ws-indicator-type"]));
+            std::exit(EXIT_FAILURE);
+        }
     } else {
         lg::warn("no workspace indicator type provided, using default (id)");
         css_buf = std::format("{}\n{}", themes::id_ws, css_buf);
