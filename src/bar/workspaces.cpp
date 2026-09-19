@@ -1,5 +1,6 @@
 #include "workspaces.hpp"
 #include "bar.hpp"
+#include "workspace.hpp"
 
 void bar::modules::Workspaces::change_active_ws(int ws_id) {
     for (auto workspace : this->workspaces) {
@@ -33,10 +34,13 @@ void bar::modules::Workspaces::create_ws(int ws_id) {
     }
 }
 
-bar::modules::Workspaces::Workspaces(std::shared_ptr<hyprland::Ipc> Ipc, std::string indicator_type)
-    : ipc(Ipc)
+hyprland::Workspace* bar::modules::Workspaces::get_ws_by_id (int id) {
+  return workspaces[id];
+}
+
+bar::modules::Workspaces::Workspaces(std::vector<hyprland::Workspace*> ws, std::string indicator_type)
+    : workspaces(ws)
     , indicator_type(indicator_type) {
-    this->workspaces = this->ipc->get_initial_workspaces();
     this->set_orientation(bar::orientation);
     this->set_spacing(6);
 

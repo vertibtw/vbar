@@ -1,0 +1,44 @@
+#include "layout.hpp"
+#include "../util/log.hpp"
+#include <gtkmm/object.h>
+
+namespace bar::modules {
+
+  void LayoutBtn::on_workspace_change(hyprland::Workspace* ws) {
+    for (auto [layout, icon] : this->icons) {
+      if (ws->layout == layout) {
+          this->l->set_text(icon);
+          return;
+      }
+    }
+    this->l->set_text("unknown");
+  }
+
+  LayoutBtn::LayoutBtn(std::vector<std::shared_ptr<hyprland::Workspace>> ws) {
+    int active_ws_id = -1;
+    for (auto [id, layout] : this->workspaces) {
+      layout = "dwindle"; // dwindle by default
+    }
+
+    for (auto w : ws) {
+      this->workspaces[w->id] = w->layout;
+      if (w->active) active_ws_id = w->id;
+    }
+    
+    if (active_ws_id = -1) {
+      lg::err("no active workspace id provided, layout button will not be created.");
+      return;        
+    }
+
+    Gtk::make_managed<Gtk::Label>("unknown");
+    for (auto [layout, icon] : this->icons) {
+        if (ws[active_ws_id]->layout == layout)
+          this->l->set_text(icon);
+    }
+
+    this->append(*this->l);
+
+    this->
+  }
+  
+}

@@ -21,6 +21,7 @@
 #include "volume/volume_window.hpp"
 #include "window_title.hpp"
 #include "workspaces.hpp"
+#include "layout.hpp"
 
 namespace bar {
 
@@ -38,8 +39,9 @@ class Bar : public Gtk::Window {
     bar::modules::VolumeWindow *mod_vol_win = nullptr;
     bar::modules::RecordButton *mod_sr_btn = nullptr;
     bar::modules::PickerButton *mod_cp_btn = nullptr;
+    bar::modules::LayoutBtn *mod_layout_btn= nullptr;
 
-    void apply_modules(std::string &, Gtk::Box *, std::shared_ptr<ini>);
+    void apply_modules(std::string &, Gtk::Box *, std::shared_ptr<ini>, std::vector<hyprland::Workspace*>);
 
     public:
     Bar(std::shared_ptr<ini>);

@@ -1,9 +1,11 @@
 #include "bar.hpp"
+#include "layout.hpp"
+#include "workspace.hpp"
 #include <glib-unix.h>
 #include <print>
 
 namespace bar {
-void Bar::apply_modules(std::string &list, Gtk::Box *box, std::shared_ptr<ini> conf) {
+  void Bar::apply_modules(std::string &list, Gtk::Box *box, std::shared_ptr<ini> conf, std::vector<hyprland::Workspace*> initial_ws) {
     for (const auto &sub : list | std::views::split(',')) {
         std::string mod_name(sub.begin(), sub.end());
         if (mod_name.empty())
@@ -18,8 +20,11 @@ void Bar::apply_modules(std::string &list, Gtk::Box *box, std::shared_ptr<ini> c
             } else {
                 type = "id";
             }
-            this->mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc, type);
+            this->mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(initial_ws, type);
             box->append(*this->mod_workspaces);
+        } else if (mod_name == "layout") {
+            this->mod_layout_btn = Gtk::make_managed<bar::modules::LayoutBtn>(initial_ws, this->ipc);
+            box->append(*this->mod_layout_btn);
         } else if (mod_name == "title") {
             this->mod_window_title = Gtk::make_managed<bar::modules::WindowTitle>(this->ipc);
             box->append(*this->mod_window_title);
@@ -173,15 +178,16 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     main_box->set_center_widget(*c_box);
     main_box->set_end_widget(*r_box);
 
+    auto initial_ws = this->ipc->get_initial_workspaces();
     if ((*conf).contains("bar", "modules-left")) {
-        apply_modules((*conf)["bar"]["modules-left"], l_box, conf);
+      apply_modules((*conf)["bar"]["modules-left"], l_box, conf, initial_ws);
     }
 
     if ((*conf).contains("bar", "modules-center")) {
-        apply_modules((*conf)["bar"]["modules-center"], c_box, conf);
+      apply_modules((*conf)["bar"]["modules-center"], c_box, conf, initial_ws);
     }
     if ((*conf).contains("bar", "modules-right")) {
-        apply_modules((*conf)["bar"]["modules-right"], r_box, conf);
+      apply_modules((*conf)["bar"]["modules-right"], r_box, conf, initial_ws);
     }
 
     // orientation
@@ -197,11 +203,13 @@ Bar::Bar(std::shared_ptr<ini> conf) {
                 if (this->mod_workspaces) {
                     int ws_id = std::stoi(arg);
                     this->mod_workspaces->change_active_ws(ws_id);
+                    if (this->mod_layout_btn) this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
                 }
             } else if (event == "createworkspace") {
                 if (this->mod_workspaces) {
                     int ws_id = std::stoi(arg);
                     this->mod_workspaces->create_ws(ws_id);
+                    if (this->mod_layout_btn) this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
                 }
             } else if (event == "destroyworkspace") {
                 if (this->mod_workspaces) {

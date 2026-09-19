@@ -1,4 +1,6 @@
 #include "ipc.hpp"
+#include <memory>
+#include <unordered_map>
 
 namespace hyprland {
 Ipc::Ipc() {
@@ -92,7 +94,7 @@ void Ipc::socket2() {
     }
 }
 
-std::vector<Workspace *> Ipc::get_initial_workspaces() {
+std::vector<hyprland::Workspace*> Ipc::get_initial_workspaces() {
     std::string raw_ws = socket1("j/workspaces");
     std::string raw_active_ws = socket1("j/activeworkspace");
 
@@ -107,20 +109,24 @@ std::vector<Workspace *> Ipc::get_initial_workspaces() {
         lg::err("ipc did not provide active workspace id");
     }
 
-    std::vector<int> ws_ids;
+    std::map<int, std::string> ws_ids;
     for (const auto &obj : j_ws) {
+        int id = 0;
         if (obj.contains("id")) {
-            int id = obj["id"].get<int>();
+            id = obj["id"].get<int>();
             if (id >= 0)
-                ws_ids.push_back(id);
+                ws_ids[id] = "";
         } else {
             lg::err("workspace doesn't contain id");
         }
+
+        if (obj.contains("tiledLayout")) {
+          std::string layout = obj["tiledLayout"].get<std::string>();
+          ws_ids[id] = layout;
+        }
     }
 
-    std::sort(ws_ids.begin(), ws_ids.end());
-
-    std::vector<Workspace *> workspaces;
+    std::vector<hyprland::Workspace*> workspaces;
 
     for (int i = 1; i <= 10; i++) {
         auto ws = Gtk::make_managed<hyprland::Workspace>();
@@ -130,7 +136,7 @@ std::vector<Workspace *> Ipc::get_initial_workspaces() {
         workspaces.push_back(ws);
     }
 
-    for (int id : ws_ids) {
+    for (const auto& [id, layout] : ws_ids) {
         if (id >= 1 && id <= 10) {
             Workspace *ws = workspaces[id - 1];
             ws->exists = true;
@@ -141,6 +147,7 @@ std::vector<Workspace *> Ipc::get_initial_workspaces() {
             } else {
                 ws->add_css_class("occupied");
             }
+            ws->layout = layout;
         } else if (id > 10) { // workspace buttons with ids > 10 are separate
             auto ws = Gtk::make_managed<hyprland::Workspace>();
             ws->id = id;
@@ -152,7 +159,7 @@ std::vector<Workspace *> Ipc::get_initial_workspaces() {
             } else {
                 ws->add_css_class("occupied");
             }
-
+            ws->layout = layout;
             workspaces.push_back(ws);
         }
     }

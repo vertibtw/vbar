@@ -6,6 +6,8 @@ namespace hyprland {
 class Workspace : public Gtk::Box {
     public:
     int id = -1;
+    // TODO: make this an enum
+    std::string layout = "dwindle"; // assuming dwindle is default
     bool active = false;
     bool exists = false;
 
