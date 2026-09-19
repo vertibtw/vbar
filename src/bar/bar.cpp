@@ -1,4 +1,6 @@
 #include "bar.hpp"
+#include <glib-unix.h>
+#include <print>
 
 namespace bar {
 void Bar::apply_modules(std::string &list, Gtk::Box *box, std::shared_ptr<ini> conf) {
@@ -55,6 +57,18 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     gtk_layer_set_namespace(this->gobj(), "v.bar");
 
     this->ipc = std::make_shared<hyprland::Ipc>();
+
+    // g_unix_signal_add(SIGUSR1, &this->toggle_visible, NULL);
+    g_unix_signal_add(
+        SIGUSR1,
+        +[](gpointer data) -> gboolean {
+            auto *bar = static_cast<Bar *>(data);
+
+            bar->set_visible(!bar->get_visible());
+
+            return G_SOURCE_CONTINUE;
+        },
+        this);
 
     gtk_layer_auto_exclusive_zone_enable(this->gobj());
 

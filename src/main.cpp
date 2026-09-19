@@ -42,7 +42,6 @@ int main(int argc, char **argv) {
     auto css = Gtk::CssProvider::create();
     std::string css_buf;
 
-    // this is a terrible excuse to use std::format lol
     if (conf->contains("", "theme")) {
         if ((*conf)[""]["theme"] == "catppuccin mocha")
             css_buf = std::format("{}\n{}", themes::catppuccin::mocha, themes::core);
@@ -86,10 +85,11 @@ int main(int argc, char **argv) {
         Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), css,
                                                     GTK_STYLE_PROVIDER_PRIORITY_USER + 1);
         app->add_window(*bar_widget);
+        app->hold(); // so that the whole program doesn't die on bar being hidden
         app->signal_activate().connect([&]() -> void { bar_widget->present(); });
     });
 
-    app->signal_shutdown().connect([]() -> void {});
+    app->signal_shutdown().connect([]() -> void { lg::info("bye bye"); });
 
     return app->run(argc, argv);
 }
