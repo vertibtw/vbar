@@ -34,11 +34,15 @@ void bar::modules::Workspaces::create_ws(int ws_id) {
     }
 }
 
-hyprland::Workspace* bar::modules::Workspaces::get_ws_by_id (int id) {
-  return workspaces[id];
+hyprland::Workspace *bar::modules::Workspaces::get_ws_by_id(int id) {
+    for (auto workspace : this->workspaces) {
+        if (workspace->id == id)
+            return workspace;
+    }
+    return nullptr;
 }
 
-bar::modules::Workspaces::Workspaces(std::vector<hyprland::Workspace*> ws, std::string indicator_type)
+bar::modules::Workspaces::Workspaces(std::vector<hyprland::Workspace *> ws, std::string indicator_type)
     : workspaces(ws)
     , indicator_type(indicator_type) {
     this->set_orientation(bar::orientation);

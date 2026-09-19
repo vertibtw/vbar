@@ -103,7 +103,9 @@ std::vector<hyprland::Workspace*> Ipc::get_initial_workspaces() {
     nlohmann::json j_a_ws = nlohmann::json::parse(raw_active_ws);
 
     int active_ws_id = -1;
-    if (j_a_ws.contains("id")) {
+    if (j_a_ws.contains("address")) {
+        active_ws_id = std::stoi(j_a_ws["address"].get<std::string>());
+    } else if (j_a_ws.contains("id")) {
         active_ws_id = j_a_ws["id"].get<int>();
     } else {
         lg::err("ipc did not provide active workspace id");
@@ -112,7 +114,11 @@ std::vector<hyprland::Workspace*> Ipc::get_initial_workspaces() {
     std::map<int, std::string> ws_ids;
     for (const auto &obj : j_ws) {
         int id = 0;
-        if (obj.contains("id")) {
+        if (obj.contains("address")) {
+            id = std::stoi(obj["address"].get<std::string>());
+            if (id >= 0)
+              ws_ids[id] = "";
+        } else if (obj.contains("id")) {
             id = obj["id"].get<int>();
             if (id >= 0)
                 ws_ids[id] = "";
