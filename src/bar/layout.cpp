@@ -5,6 +5,7 @@
 namespace bar::modules {
 
 void LayoutBtn::on_workspace_change(hyprland::Workspace *ws) {
+    this->active_ws = ws->id;
     auto it = this->workspaces.find(ws->id);
     if (it != this->workspaces.end()) {
         auto icon_it = icons.find(it->second);
@@ -50,8 +51,8 @@ LayoutBtn::LayoutBtn(std::vector<hyprland::Workspace *> ws, std::shared_ptr<hypr
             if (it == icons.end())
                 it = icons.begin();
             workspaces[this->active_ws] = it->first;
-            std::ignore = ipc->socket1(
-                std::format("eval hl.workspace_rule({{ workspace = \"{}\", layout = \"{}\" }})", this->active_ws, workspaces[this->active_ws]));
+            std::ignore = ipc->socket1(std::format("eval hl.workspace_rule({{ workspace = \"{}\", layout = \"{}\" }})",
+                                                   this->active_ws, workspaces[this->active_ws]));
             this->l->set_text(it->second);
         }
     });
