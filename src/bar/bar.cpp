@@ -5,7 +5,8 @@
 #include <print>
 
 namespace bar {
-  void Bar::apply_modules(std::string &list, Gtk::Box *box, std::shared_ptr<ini> conf, std::vector<hyprland::Workspace*> initial_ws) {
+void Bar::apply_modules(std::string &list, Gtk::Box *box, std::shared_ptr<ini> conf,
+                        std::vector<hyprland::Workspace *> initial_ws) {
     for (const auto &sub : list | std::views::split(',')) {
         std::string mod_name(sub.begin(), sub.end());
         if (mod_name.empty())
@@ -180,14 +181,14 @@ Bar::Bar(std::shared_ptr<ini> conf) {
 
     auto initial_ws = this->ipc->get_initial_workspaces();
     if ((*conf).contains("bar", "modules-left")) {
-      apply_modules((*conf)["bar"]["modules-left"], l_box, conf, initial_ws);
+        apply_modules((*conf)["bar"]["modules-left"], l_box, conf, initial_ws);
     }
 
     if ((*conf).contains("bar", "modules-center")) {
-      apply_modules((*conf)["bar"]["modules-center"], c_box, conf, initial_ws);
+        apply_modules((*conf)["bar"]["modules-center"], c_box, conf, initial_ws);
     }
     if ((*conf).contains("bar", "modules-right")) {
-      apply_modules((*conf)["bar"]["modules-right"], r_box, conf, initial_ws);
+        apply_modules((*conf)["bar"]["modules-right"], r_box, conf, initial_ws);
     }
 
     // orientation
@@ -203,13 +204,15 @@ Bar::Bar(std::shared_ptr<ini> conf) {
                 if (this->mod_workspaces) {
                     int ws_id = std::stoi(arg);
                     this->mod_workspaces->change_active_ws(ws_id);
-                    if (this->mod_layout_btn) this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
+                    if (this->mod_layout_btn)
+                        this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
                 }
             } else if (event == "createworkspace") {
                 if (this->mod_workspaces) {
                     int ws_id = std::stoi(arg);
                     this->mod_workspaces->create_ws(ws_id);
-                    if (this->mod_layout_btn) this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
+                    if (this->mod_layout_btn)
+                        this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
                 }
             } else if (event == "destroyworkspace") {
                 if (this->mod_workspaces) {
