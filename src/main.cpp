@@ -3,8 +3,10 @@
 #include <fstream>
 #include <gtkmm.h>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <print>
+#include <set>
 #include <sstream>
 
 #include "bar/bar.hpp"
@@ -74,22 +76,88 @@ int main(int argc, char **argv) {
         css_buf = std::format("{}\n{}", themes::id_ws, css_buf);
     }
 
-    lg::info(std::format("css_buf = \n {}", css_buf));
-
     auto app = Gtk::Application::create("v.bar");
 
-    auto bar_widget = Gtk::make_managed<bar::Bar>(conf);
+    auto ipc = std::make_shared<hyprland::Ipc>();
+
+    // I don't think there's a way to do this with Gtk::make_managed, sorry not sorry :p
+    auto bars = std::make_shared<std::map<GdkMonitor *, std::unique_ptr<bar::Bar>>>();
+    auto names = std::make_shared<std::map<GdkMonitor *, std::string>>(); // literally just so I can have the names when removing monitors.
+
+    ipc->on_event = [&](std::string event, std::string arg) -> void {
+        for (auto &[_, bar] : *bars) {
+            if (bar)
+                bar->on_event(event, arg);
+        }
+    };
 
     app->signal_startup().connect([&]() -> void {
         css->load_from_data(css_buf);
         Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), css,
                                                     GTK_STYLE_PROVIDER_PRIORITY_USER + 1);
-        app->add_window(*bar_widget);
-        app->hold(); // so that the whole program doesn't die on bar being hidden
-        app->signal_activate().connect([&]() -> void { bar_widget->present(); });
+
+        auto display = Gdk::Display::get_default();
+        if (!display) {
+            lg::err("no Gdk display available.");
+            return;
+        }
+        auto monitors = display->get_monitors();
+        if (!monitors) {
+            lg::err("no monitor list available.");
+            return;
+        }
+
+        auto update_monitors = [app, conf, ipc, bars, names, monitors]() {
+            std::map<GdkMonitor *, std::string> current;
+            for (int i = 0; i < monitors->get_n_items(); ++i) {
+                auto m = monitors->get_typed_object<Gdk::Monitor>(i);
+                if (!m)
+                    continue;    
+                current[m->gobj()] = m->get_connector();
+            }
+
+            // remove old monitors
+            for (auto it = bars->begin(); it != bars->end();) {
+                if (!current.contains(it->first)) {
+                    lg::info(std::format("removing bar for monitor '{}'", (*names)[it->first]));
+                    app->remove_window(*it->second);
+                    names->erase(it->first);
+                    it = bars->erase(it);
+                } else {
+                    it++;
+                }
+            }
+
+            // add new monitors
+            for (auto& [mon, connector] : current) {
+                if (bars->contains(mon))
+                    continue;
+                lg::info (std::format("adding bar for monitor '{}'", connector));
+                auto bar = std::make_unique<bar::Bar>(conf, ipc, mon);
+                app->add_window(*bar);
+                bar->present();
+                (*bars)[mon] = std::move(bar);
+                (*names)[mon] = connector;
+            }
+        };
+
+        monitors->signal_items_changed().connect([update_monitors](guint, guint, guint) { update_monitors(); });
+        update_monitors();
+        app->hold();
+
+        app->signal_activate().connect([bars]() -> void {
+            for (auto &[_, bar] : *bars)
+                bar->present();
+        });
     });
 
-    app->signal_shutdown().connect([]() -> void { lg::info("bye bye"); });
+    app->signal_shutdown().connect([app, bars, names]() -> void {
+        lg::info("bye bye");
+        for (auto &[_, bar] : *bars)
+            app->remove_window(*bar);
+        bars->clear();
+        names->clear();
+    });
 
     return app->run(argc, argv);
 }

@@ -13,8 +13,12 @@ class Battery : public Gtk::Box {
     Gtk::Label *st_icon;
     Gtk::Label *percentage;
 
+    sigc::connection c;
+
     public:
     Battery();
-    ~Battery() = default;
+    ~Battery() {
+        this->c.disconnect();
+    };
 };
 } // namespace bar::modules

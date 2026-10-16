@@ -12,6 +12,6 @@ TODO:
   - [x] basic ini config
   - [x] configurable module positions
   - [ ] vertical bar
-- [ ] support multiple monitors
+- [x] support multiple monitors
 - [ ] systray
 - [ ] proper logging

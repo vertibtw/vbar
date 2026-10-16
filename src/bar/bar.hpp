@@ -16,12 +16,12 @@
 #include "battery.hpp"
 #include "clock.hpp"
 #include "color_picker.hpp"
+#include "layout.hpp"
 #include "screen_recording.hpp"
 #include "volume/volume_button.hpp"
 #include "volume/volume_window.hpp"
 #include "window_title.hpp"
 #include "workspaces.hpp"
-#include "layout.hpp"
 
 namespace bar {
 
@@ -39,12 +39,16 @@ class Bar : public Gtk::Window {
     bar::modules::VolumeWindow *mod_vol_win = nullptr;
     bar::modules::RecordButton *mod_sr_btn = nullptr;
     bar::modules::PickerButton *mod_cp_btn = nullptr;
-    bar::modules::LayoutBtn *mod_layout_btn= nullptr;
+    bar::modules::LayoutBtn *mod_layout_btn = nullptr;
 
-    void apply_modules(std::string &, Gtk::Box *, std::shared_ptr<ini>, std::vector<hyprland::Workspace*>);
+    void apply_modules(std::string &, Gtk::Box *, std::shared_ptr<ini>, std::vector<hyprland::Workspace *>);
 
     public:
-    Bar(std::shared_ptr<ini>);
+    GdkMonitor *monitor;
+
+    void on_event(std::string event, std::string arg);
+
+    Bar(std::shared_ptr<ini>, std::shared_ptr<hyprland::Ipc>, GdkMonitor *);
     ~Bar() = default;
 };
 

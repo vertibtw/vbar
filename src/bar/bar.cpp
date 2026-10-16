@@ -52,7 +52,46 @@ void Bar::apply_modules(std::string &list, Gtk::Box *box, std::shared_ptr<ini> c
     }
 }
 
-Bar::Bar(std::shared_ptr<ini> conf) {
+void Bar::on_event(std::string event, std::string arg) {
+    Glib::signal_idle().connect_once([this, event, arg]() -> void {
+        if (event == "workspace") {
+            if (this->mod_workspaces) {
+                int ws_id = std::stoi(arg);
+                this->mod_workspaces->change_active_ws(ws_id);
+                if (this->mod_layout_btn)
+                    this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
+            }
+        } else if (event == "createworkspace") {
+            if (this->mod_workspaces) {
+                int ws_id = std::stoi(arg);
+                this->mod_workspaces->create_ws(ws_id);
+                if (this->mod_layout_btn)
+                    this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
+            }
+        } else if (event == "destroyworkspace") {
+            if (this->mod_workspaces) {
+                int ws_id = std::stoi(arg);
+                this->mod_workspaces->destroy_ws(ws_id);
+            }
+        } else if (event == "activewindow") {
+            if (this->mod_window_title)
+                this->mod_window_title->on_window_title_change(arg);
+        } else if (event == "focusedmon") {
+            if (this->mod_workspaces) {
+                int ws_id = std::stoi(arg.substr(arg.find(',') + 1));
+                this->mod_workspaces->change_active_ws(ws_id);
+                if (this->mod_layout_btn)
+                    this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
+            }
+        } else {
+            // std::cout << "ommited event: " << event << " >> " << arg << "\n";
+        }
+    });
+}
+
+Bar::Bar(std::shared_ptr<ini> conf, std::shared_ptr<hyprland::Ipc> ipc, GdkMonitor *monitor)
+    : ipc(ipc)
+    , monitor(monitor) {
     if (!(*conf).contains("bar")) {
         lg::err("config does not contain a bar section, bar will not be created.");
         return;
@@ -60,9 +99,10 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     this->set_title("v.bar");
     this->set_default_size(67, 69);
     gtk_layer_init_for_window(this->gobj());
+    gtk_layer_set_monitor(this->gobj(), this->monitor);
     gtk_layer_set_namespace(this->gobj(), "v.bar");
 
-    this->ipc = std::make_shared<hyprland::Ipc>();
+    // this->ipc = std::make_shared<hyprland::Ipc>();
 
     // g_unix_signal_add(SIGUSR1, &this->toggle_visible, NULL);
     g_unix_signal_add(
@@ -196,43 +236,5 @@ Bar::Bar(std::shared_ptr<ini> conf) {
     l_box->set_orientation(bar::orientation);
     c_box->set_orientation(bar::orientation);
     r_box->set_orientation(bar::orientation);
-
-    // lambdas :<
-    ipc->on_event = [this](std::string event, std::string arg) -> void {
-        Glib::signal_idle().connect_once([this, event, arg]() -> void {
-            if (event == "workspace") {
-                if (this->mod_workspaces) {
-                    int ws_id = std::stoi(arg);
-                    this->mod_workspaces->change_active_ws(ws_id);
-                    if (this->mod_layout_btn)
-                        this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
-                }
-            } else if (event == "createworkspace") {
-                if (this->mod_workspaces) {
-                    int ws_id = std::stoi(arg);
-                    this->mod_workspaces->create_ws(ws_id);
-                    if (this->mod_layout_btn)
-                        this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
-                }
-            } else if (event == "destroyworkspace") {
-                if (this->mod_workspaces) {
-                    int ws_id = std::stoi(arg);
-                    this->mod_workspaces->destroy_ws(ws_id);
-                }
-            } else if (event == "activewindow") {
-                if (this->mod_window_title)
-                    this->mod_window_title->on_window_title_change(arg);
-            } else if (event == "focusedmon") {
-                if (this->mod_workspaces) {
-                    int ws_id = std::stoi(arg.substr(arg.find(',') + 1));
-                    this->mod_workspaces->change_active_ws(ws_id);
-                    if (this->mod_layout_btn)
-                        this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
-                }
-            } else {
-                // std::cout << "ommited event: " << event << " >> " << arg << "\n";
-            }
-        });
-    };
 }
 } // namespace bar
