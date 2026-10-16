@@ -222,6 +222,13 @@ Bar::Bar(std::shared_ptr<ini> conf) {
             } else if (event == "activewindow") {
                 if (this->mod_window_title)
                     this->mod_window_title->on_window_title_change(arg);
+            } else if (event == "focusedmon") {
+                if (this->mod_workspaces) {
+                    int ws_id = std::stoi(arg.substr(arg.find(',') + 1));
+                    this->mod_workspaces->change_active_ws(ws_id);
+                    if (this->mod_layout_btn)
+                        this->mod_layout_btn->on_workspace_change(this->mod_workspaces->get_ws_by_id(ws_id));
+                }
             } else {
                 // std::cout << "ommited event: " << event << " >> " << arg << "\n";
             }
