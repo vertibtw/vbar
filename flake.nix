@@ -93,7 +93,7 @@
                       type = lib.types.listOf lib.types.str;
                       default = [ ];
                     };
-                    rounding = {
+                    rounding = lib.mkOption {
                       type = lib.types.ints.unsigned;
                       default = 0;
                     };
