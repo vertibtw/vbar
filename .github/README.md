@@ -14,4 +14,7 @@ TODO:
   - [ ] vertical bar
 - [x] support multiple monitors
 - [ ] systray
+  - [x] basics
+  - [ ] context menus
+- [x] media module
 - [ ] proper logging
