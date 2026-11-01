@@ -122,6 +122,7 @@
               ${lib.optionalString (cfg.settings.bar.modules-left != []) "modules-left = ${lib.concatStringsSep "," cfg.settings.bar.modules-left}"}
               ${lib.optionalString (cfg.settings.bar.modules-center != []) "modules-center = ${lib.concatStringsSep "," cfg.settings.bar.modules-center}"}
               ${lib.optionalString (cfg.settings.bar.modules-right != []) "modules-right = ${lib.concatStringsSep "," cfg.settings.bar.modules-right}"}
+              rounding = ${cfg.settings.bar.rounding}
               ws-indicator-type = ${cfg.settings.bar.ws-indicator-type}
             '';
           };
