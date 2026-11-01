@@ -93,6 +93,10 @@
                       type = lib.types.listOf lib.types.str;
                       default = [ ];
                     };
+                    rounding = {
+                      type = lib.types.ints.unsigned;
+                      default = 0;
+                    };
                     ws-indicator-type = lib.mkOption {
                       type = lib.types.enum [ "id" "pill" ];
                       default = "id";

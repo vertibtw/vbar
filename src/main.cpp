@@ -81,6 +81,13 @@ int main(int argc, char **argv) {
         css_buf = std::format("{}\n{}", themes::id_ws, css_buf);
     }
 
+    if (conf->contains("bar", "rounding")) {
+        // home-manager checks if this is an integer, if you're using the plain ini config, well, uh good luck I guess
+        int r = std::stoi((*conf)["bar"]["rounding"]);
+
+        css_buf = std::format(".bar {{ border-radius: {}px; }}\n{}", r, css_buf);
+    }
+
     auto app = Gtk::Application::create("v.bar");
 
     auto ipc = std::make_shared<hyprland::Ipc>();
