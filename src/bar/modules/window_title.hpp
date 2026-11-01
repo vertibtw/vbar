@@ -1,5 +1,5 @@
 #pragma once
-#include "../ipc/hyprland/ipc.hpp"
+#include "../../ipc/hyprland/ipc.hpp"
 #include <gtkmm.h>
 #include <memory>
 #include <string>

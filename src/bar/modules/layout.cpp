@@ -1,5 +1,5 @@
 #include "layout.hpp"
-#include "../util/log.hpp"
+#include "../../util/log.hpp"
 #include <gtkmm/object.h>
 
 namespace bar::modules {

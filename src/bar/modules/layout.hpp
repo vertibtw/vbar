@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "../ipc/hyprland/ipc.hpp"
+#include "../../ipc/hyprland/ipc.hpp"
 #include "workspace.hpp"
 
 namespace bar::modules {

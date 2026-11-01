@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ipc/hyprland/ipc.hpp"
+#include "../../ipc/hyprland/ipc.hpp"
 #include "workspace.hpp"
 #include <gtkmm/box.h>
 #include <gtkmm/enums.h>

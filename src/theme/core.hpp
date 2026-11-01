@@ -174,5 +174,11 @@ label.rotated {
     color: var(--foreground_main);
 
 }
+.image_btn {
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    min-height: 0;
+}
 )CSS";
 } // namespace themes

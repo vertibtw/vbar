@@ -1,6 +1,6 @@
 #include "bar.hpp"
-#include "layout.hpp"
-#include "workspace.hpp"
+#include "modules/layout.hpp"
+#include "modules/workspace.hpp"
 #include <glib-unix.h>
 #include <print>
 
@@ -36,9 +36,9 @@ void Bar::apply_modules(std::string &list, Gtk::Box *box, std::shared_ptr<ini> c
             this->mod_battery = Gtk::make_managed<bar::modules::Battery>();
             box->append(*this->mod_battery);
         } else if (mod_name == "volume") {
-            this->mod_vol_win = Gtk::make_managed<bar::modules::VolumeWindow>();
-            this->mod_vol_btn = Gtk::make_managed<bar::modules::VolumeButton>(this->mod_vol_win);
-            this->mod_vol_win->volume_button = this->mod_vol_btn;
+            this->mod_vol_win = Gtk::make_managed<bar::modules::VolumeWindow>(this->services->volume);
+            this->mod_vol_btn =
+                Gtk::make_managed<bar::modules::VolumeButton>(this->mod_vol_win, this->services->volume);
             box->append(*this->mod_vol_btn);
         } else if (mod_name == "record") {
             this->mod_sr_btn = Gtk::make_managed<bar::modules::RecordButton>();
@@ -46,6 +46,12 @@ void Bar::apply_modules(std::string &list, Gtk::Box *box, std::shared_ptr<ini> c
         } else if (mod_name == "cpicker") {
             this->mod_cp_btn = Gtk::make_managed<bar::modules::PickerButton>();
             box->append(*this->mod_cp_btn);
+        } else if (mod_name == "systray") {
+            this->mod_systray = Gtk::make_managed<bar::modules::Systray>(this->services->tray);
+            box->append(*this->mod_systray);
+        } else if (mod_name == "media") {
+            this->mod_media = Gtk::make_managed<bar::modules::Media>(this->services->mpris);
+            box->append(*this->mod_media);
         } else {
             lg::warn(std::format("invalid module '{}', skipping", mod_name));
         }
@@ -89,8 +95,10 @@ void Bar::on_event(std::string event, std::string arg) {
     });
 }
 
-Bar::Bar(std::shared_ptr<ini> conf, std::shared_ptr<hyprland::Ipc> ipc, GdkMonitor *monitor)
+Bar::Bar(std::shared_ptr<ini> conf, std::shared_ptr<hyprland::Ipc> ipc, std::shared_ptr<Services> services,
+         GdkMonitor *monitor)
     : ipc(ipc)
+    , services(services)
     , monitor(monitor) {
     if (!(*conf).contains("bar")) {
         lg::err("config does not contain a bar section, bar will not be created.");

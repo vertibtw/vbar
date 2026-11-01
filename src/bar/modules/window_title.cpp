@@ -1,6 +1,6 @@
 #include "window_title.hpp"
-#include "../util/extern/json.hpp"
-#include "bar.hpp"
+#include "../../util/extern/json.hpp"
+#include "../bar.hpp"
 
 namespace bar::modules {
 WindowTitle::WindowTitle(std::shared_ptr<hyprland::Ipc> Ipc)

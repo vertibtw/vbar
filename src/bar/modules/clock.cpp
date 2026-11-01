@@ -1,5 +1,5 @@
 #include "clock.hpp"
-#include "bar.hpp"
+#include "../bar.hpp"
 
 namespace bar::modules {
 bool Clock::update() {

@@ -1,5 +1,5 @@
 #include "workspaces.hpp"
-#include "bar.hpp"
+#include "../bar.hpp"
 #include "workspace.hpp"
 
 void bar::modules::Workspaces::change_active_ws(int ws_id) {

@@ -14,4 +14,7 @@ inline void warn(std::string msg) {
 inline void err(std::string msg) {
     std::println("\e[1;31mERROR\e[0m: {}", msg);
 }
+inline void note(std::string msg) {
+    std::println("\e[1;36mNOTE\e[0m: {}", msg);
+}
 } // namespace lg

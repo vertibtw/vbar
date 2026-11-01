@@ -11,10 +11,15 @@
 
 #include "bar/bar.hpp"
 #include "ini/ini.hpp"
+#include "services/mpris_service.hpp"
+#include "services/tray_service.hpp"
+#include "services/volume_service.hpp"
 #include "theme/core.hpp"
 #include "util/log.hpp"
 
 int main(int argc, char **argv) {
+    Glib::init();
+
     std::stringstream ss;
     std::string home_dir;
     char *home_dir_ = std::getenv("HOME");
@@ -80,9 +85,15 @@ int main(int argc, char **argv) {
 
     auto ipc = std::make_shared<hyprland::Ipc>();
 
+    auto services = std::make_shared<bar::Services>();
+    services->volume = std::make_shared<bar::services::VolumeService>();
+    services->mpris = std::make_shared<bar::services::MprisService>();
+    services->tray = std::make_shared<bar::services::TrayService>();
+
     // I don't think there's a way to do this with Gtk::make_managed, sorry not sorry :p
     auto bars = std::make_shared<std::map<GdkMonitor *, std::unique_ptr<bar::Bar>>>();
-    auto names = std::make_shared<std::map<GdkMonitor *, std::string>>(); // literally just so I can have the names when removing monitors.
+    auto names = std::make_shared<std::map<GdkMonitor *, std::string>>(); // literally just so I can have the names when
+                                                                          // removing monitors.
 
     ipc->on_event = [&](std::string event, std::string arg) -> void {
         for (auto &[_, bar] : *bars) {
@@ -107,12 +118,12 @@ int main(int argc, char **argv) {
             return;
         }
 
-        auto update_monitors = [app, conf, ipc, bars, names, monitors]() {
+        auto update_monitors = [app, conf, ipc, services, bars, names, monitors]() {
             std::map<GdkMonitor *, std::string> current;
             for (int i = 0; i < monitors->get_n_items(); ++i) {
                 auto m = monitors->get_typed_object<Gdk::Monitor>(i);
                 if (!m)
-                    continue;    
+                    continue;
                 current[m->gobj()] = m->get_connector();
             }
 
@@ -129,11 +140,11 @@ int main(int argc, char **argv) {
             }
 
             // add new monitors
-            for (auto& [mon, connector] : current) {
+            for (auto &[mon, connector] : current) {
                 if (bars->contains(mon))
                     continue;
-                lg::info (std::format("adding bar for monitor '{}'", connector));
-                auto bar = std::make_unique<bar::Bar>(conf, ipc, mon);
+                lg::info(std::format("adding bar for monitor '{}'", connector));
+                auto bar = std::make_unique<bar::Bar>(conf, ipc, services, mon);
                 app->add_window(*bar);
                 bar->present();
                 (*bars)[mon] = std::move(bar);

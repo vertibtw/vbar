@@ -1,6 +1,6 @@
 #pragma once
 // #include "../../bar/bar.hpp"
-#include "../../bar/workspace.hpp"
+#include "../../bar/modules/workspace.hpp"
 #include "../../util/extern/json.hpp"
 #include "../../util/log.hpp"
 
@@ -33,7 +33,7 @@ class Ipc {
     [[nodiscard]] std::string socket1(std::string);
     void socket2();
     // TODO: move this out of here
-    [[nodiscard]] std::vector< hyprland::Workspace* > get_initial_workspaces();
+    [[nodiscard]] std::vector<hyprland::Workspace *> get_initial_workspaces();
 
     Ipc();
     ~Ipc();
